@@ -1,2 +1,108 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Identifiers [a-zA-Z_][_a-zA-Z0-9]*
+# Operators [+-*/]
+# Integers [0-9]+
+
+# Superclass
+class Token():
+    pass
+
+# Specific Tokens
+class Identifier(Token):
+    def __init__(self, name):
+        self.name = name
+    
+    def __repr__(self):
+        return f'(Identifier: {self.name})'
+
+class Operator(Token):
+    def __init__(self, operator):
+        self.op = operator
+
+    def __repr__(self):
+        return f'(Operator: {self.op})'
+
+class Integer(Token):
+    def __init__(self, val):
+        self.value = val
+
+    def __repr__(self):
+        return f'(Integer: {self.value})'
+
+# Lexically analyze the tokens
+class Lexer():
+    def __init__(self, text):
+        self.text = text
+        self.pos = 0
+        self.length = len(text)
+
+    def get_token(self):
+        # Skip whitespace
+        while self.pos < self.length and self.text[self.pos] in " \t\n":
+            self.pos += 1
+
+        # No token if past end
+        if self.pos >= self.length:
+            return None
+        
+        # Operator token
+        if self.text[self.pos] in "+-*/":
+            self.pos += 1
+            return Operator(self.text[self.pos - 1])
+
+        # If the current character is a number, build up the whole integer
+        number = ""
+        while self.pos < self.length and self.text[self.pos] in "0123456789":
+            number += self.text[self.pos] # Adding next digit to the number
+            self.pos += 1
+        if number != "": # We found a number
+            return Integer(int(number))
+
+        # If current character can start an identifier, build up the identifier
+        ident = ""
+        while self.pos < self.length and self.text[self.pos] in "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
+            ident += self.text[self.pos]
+            self.pos += 1
+        if ident != "":
+            return Identifier(ident)
+
+        raise Exception("Invalid character")
+    
+    def __iter__(self):
+        token = self.get_token()
+        while token != None:
+            yield token
+            token = self.get_token()
+
+lex = Lexer("abc")
+for token in lex:
+    print(token)
+
+print("---")
+
+lex = Lexer("0abc")
+for token in lex:
+    print(token)
+    
+print("---")
+
+lex = Lexer("0abc0")
+for token in lex:
+    print(token)
+
+print("---")
+lex = Lexer("1232 * abc_squared + 3  ")
+for token in lex:
+    print(token)
+
+print("---")
+
+lex = Lexer("(123)")
+try:
+    for token in lex:
+        print(token)
+except:
+    print("Lexing failed")
+
+# Syntax analyzer - making sure tokens are in an order that make sense
+# Semantic analyzer - doing things like making sure variables are defined before they are used
+
