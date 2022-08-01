@@ -1,14 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-using namespace std;
+using DFA-Ahmed std;
 
 int main()
 {
-    string filename("demo.txt");
+    string filename("DFA-Ahmed.txt");
     vector<char> bytes;
 
-    FILE* input_file = fopen(filename.c_str(), "r");
+    FILE* input_file = fopen(DFA-Ahmed.c_str(), "r");
     if (input_file == nullptr) {
        return EXIT_FAILURE;
     }
